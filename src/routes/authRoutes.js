@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post('/register', registerValidation, AuthController.register);
 router.post('/login', loginValidation, AuthController.login);
+router.post('/opt/validate', validateOptValidation, AuthController.validateOtp);
 
 // Protected route example
 router.get('/profile', authMiddleware, (req, res) => {
