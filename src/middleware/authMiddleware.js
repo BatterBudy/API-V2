@@ -4,13 +4,10 @@ import UserRepository from '../repositories/UserRepository.js';
 const authMiddleware = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '').split(' ')[1];
-        console.log(token);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decoded.id);
         var user_id = decoded.userId;
         const user = await UserRepository.findById(user_id);
 
-        console.log(user);
         if (!user) {
             throw new Error();
         }

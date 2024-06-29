@@ -7,6 +7,8 @@ import RefreshTokenRepository from '../repositories/RefreshTokenRepository.js';
 import ms from 'ms';
 import UserInterestRepository from '../repositories/UserInterestRepository.js';
 import InterestRepository from '../repositories/InterestRepository.js';
+import InviteRepository from '../repositories/InviteRepository.js';
+import UserCommunityRepository from '../repositories/UserCommunityRepository.js';
 
 //TODO : refresh token
 class UserService {
@@ -20,14 +22,22 @@ class UserService {
             throw new Error('Phone Number already in use');
         }
 
+        //check if user was invited
+        const inviteDetails = { email: userData.email, phone_number: userData.phone_number, join_code: userData.join_code }
+        const invited_user = await InviteRepository.findByUserDetails(inviteDetails);
+
+        if (!invited_user) {
+            throw new Error('User was not invited');
+        }
+
         const user = await UserRepository.create(userData);
         if (user) {
+            await UserCommunityRepository.create(user.id, invited_user.community_id);
 
-            const otpCode = generateOTP();
-            const otpDetails = { user_id: user.id, otp_code: otpCode };
-            await OptRepository.create(otpDetails);
-            //TODO:  send otp to user
+            const inviteUpdateDetails = { id: invited_user.id, is_used: true };
+            await InviteRepository.update(inviteUpdateDetails);
         }
+
         // Destructure user and omit the password field
         const { password, ...userWithoutPassword } = user;
 

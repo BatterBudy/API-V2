@@ -1,11 +1,10 @@
-CREATE TABLE IF NOT EXISTS user_interest
-(
-    id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS user_community (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    interest_id INT NOT NULL,
+    community_id INT NOT NULL,
     is_deleted BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (interest_id) REFERENCES interest(id)
+    FOREIGN KEY (community_id) REFERENCES community(id)
 )

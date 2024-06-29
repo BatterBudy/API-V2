@@ -6,6 +6,7 @@ import otpRoutes from './routes/otpRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminInterestRoutes from './routes/admin/interestRoutes.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
+import listingRoutes from './routes/listingRoutes.js';
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use("/otp", otpRoutes);
 app.use('/user', authMiddleware, userRoutes);
+app.use('/listing', authMiddleware, listingRoutes);
 
 //Admin routes
 app.use('/admin/interest', authMiddleware, adminInterestRoutes);

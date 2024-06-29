@@ -7,29 +7,29 @@ class UserRepository {
         const hashedPassword = await bcrypt.hash(password, 8);
 
         const [result] = await pool.query(
-            'INSERT INTO users (first_name,last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?,?,?)',
+            'INSERT INTO user (first_name,last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?,?,?)',
             [first_name, last_name, email, phone_number, hashedPassword, role]
         );
         return this.findById(result.insertId);
     }
 
     async findByEmail(email) {
-        const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [rows] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
         return rows[0];
     }
 
     async findByPhoneNumber(phone_number) {
-        const [rows] = await pool.query('SELECT * FROM users WHERE phone_number = ?', [phone_number]);
+        const [rows] = await pool.query('SELECT * FROM user WHERE phone_number = ?', [phone_number]);
         return rows[0];
     }
 
     async findByEmailOrPhoneNumber(email, phone_number) {
-        const [rows] = await pool.query('SELECT * FROM users WHERE email= ? OR phone_number = ?', [email, phone_number]);
+        const [rows] = await pool.query('SELECT * FROM user WHERE email= ? OR phone_number = ?', [email, phone_number]);
         return rows[0];
     }
 
     async findById(id) {
-        const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+        const [rows] = await pool.query('SELECT * FROM user WHERE id = ?', [id]);
         return rows[0];
     }
 
