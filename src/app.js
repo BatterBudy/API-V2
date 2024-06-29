@@ -4,6 +4,7 @@ import mysql from 'mysql2/promise';
 import authRoutes from './routes/authRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import adminInterestRoutes from './routes/admin/interestRoutes.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 
 const app = express();
@@ -40,6 +41,9 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use("/otp", otpRoutes);
 app.use('/user', authMiddleware, userRoutes);
+
+//Admin routes
+app.use('/admin/interest', authMiddleware, adminInterestRoutes);
 
 
 // Start the server

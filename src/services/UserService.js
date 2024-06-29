@@ -5,6 +5,8 @@ import OptRepository from '../repositories/OtpRepository.js'
 import { generateOTP } from '../utils/otpHelper.js'
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository.js';
 import ms from 'ms';
+import UserInterestRepository from '../repositories/UserInterestRepository.js';
+import InterestRepository from '../repositories/InterestRepository.js';
 
 //TODO : refresh token
 class UserService {
@@ -94,7 +96,36 @@ class UserService {
         return userWithoutPassword;
     }
 
+    async addUserInterest({ user_id, interest_id }) {
+        const user = await UserRepository.findById(user_id);
+        if (!user) {
+            throw new Error('User not found');
+        }
 
+        //CHeck that the Interest Exists
+        const interestExist = await InterestRepository.findById(interest_id);
+        if (!interestExist) {
+            throw new Error('Interest not found');
+        }
+
+        //Check that the user has not already added the interest
+        const userInterest = await UserInterestRepository.findByUserIdAndInterestId(user_id, interest_id);
+        if (userInterest) {
+            throw new Error('User has already added this interest');
+        }
+
+        const newInterest = await UserInterestRepository.create({ user_id, interest_id });
+        return newInterest;
+    }
+
+    async getUserInterests(user_id) {
+        const user = await UserRepository.findById(user_id);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const userInterests = await UserInterestRepository.findAllByUserId(user_id);
+        return userInterests;
+    }
     generateAccessToken(user) {
         return jwt.sign(
             { userId: user.id, email: user.email },

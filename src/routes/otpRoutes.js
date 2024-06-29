@@ -1,6 +1,6 @@
 import express from 'express';
 import OtpController from '../controllers/OtpController.js';
-import { validateOptValidation } from '../middleware/authValidation.js';
+import { validateOptValidation } from '../middleware/otpValidation.js';
 
 const router = express.Router();
 

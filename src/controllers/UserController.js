@@ -1,4 +1,5 @@
 import UserService from '../services/UserService.js';
+import { validationResult } from 'express-validator';
 
 class UserController {
     async validateOtp(req, res) {
@@ -14,6 +15,7 @@ class UserController {
             res.status(400).json({ error: error.message });
         }
     }
+
     async profile(req, res) {
         try {
             const user_id = req.user.id;
@@ -24,6 +26,45 @@ class UserController {
             res.status(200).json({
                 message: 'User profile retrieved successfully',
                 data: userProfile
+            });
+        } catch (error) {
+            // Pass any errors to the error handling middleware
+            res.status(401).json({ error: error.message });
+        }
+    }
+
+    async addUserInterest(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const user_id = req.user.id;
+            const { interest_id } = req.body;
+
+            const userInterests = await UserService.addUserInterest({ user_id, interest_id });
+            if (!userInterests) {
+                return res.status(404).json({ message: 'User interests not found' });
+            }
+            res.status(200).json({
+                message: 'User interests added successfully',
+                data: userInterests
+            });
+        } catch (error) {
+            // Pass any errors to the error handling middleware
+            res.status(401).json({ error: error.message });
+        }
+    }
+    async getUserInterests(req, res) {
+        try {
+            const user_id = req.user.id;
+            const userInterests = await UserService.getUserInterests(user_id);
+            if (!userInterests) {
+                return res.status(404).json({ message: 'User interests not found' });
+            }
+            res.status(200).json({
+                message: 'User interests retrieved successfully',
+                data: userInterests
             });
         } catch (error) {
             // Pass any errors to the error handling middleware

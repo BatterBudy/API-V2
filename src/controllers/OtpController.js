@@ -1,4 +1,5 @@
 import UserService from '../services/UserService.js';
+import { validationResult } from 'express-validator';
 
 class OtpController {
     async validateOtp(req, res) {

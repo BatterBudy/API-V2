@@ -98,4 +98,6 @@ describe('AuthController', () => {
             expect(res.json).toHaveBeenCalledWith({ error: 'Invalid credentials' });
         });
     });
+
+    
 });
