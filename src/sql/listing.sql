@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS listing(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    community_id INT NOT NULL,
     interest_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     price double NOT NULL,

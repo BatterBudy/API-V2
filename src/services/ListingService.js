@@ -1,13 +1,13 @@
 import ListingRepository from '../repositories/ListingRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 import InterestRepository from '../repositories/InterestRepository.js';
-import userInterestsRepository from '../repositories/UserInterestRepository.js';
 import UserInterestRepository from '../repositories/UserInterestRepository.js';
+import UserCommunityRepository from '../repositories/UserCommunityRepository.js';
 class ListingService {
 
     async create(user_id, listing) {
         // Validate user exists
-        const { interest_id } = listing;
+        const { interest_id, community_id } = listing;
         const user = await UserRepository.findById(user_id);
         if (!user) {
             throw new Error('User not found');
@@ -17,6 +17,12 @@ class ListingService {
         const interest = await InterestRepository.findById(interest_id);
         if (!interest) {
             throw new Error('Interest not found');
+        }
+
+        // Validate that user belong to the community
+        const userCommunity = await UserCommunityRepository.findByUserIdAndCommunityId(user_id, community_id);
+        if (!userCommunity) {
+            throw new Error('User does not belong to the community');
         }
 
         listing.user_id = user_id;

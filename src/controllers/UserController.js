@@ -1,3 +1,4 @@
+import CommunityService from '../services/CommunityService.js';
 import UserService from '../services/UserService.js';
 import { validationResult } from 'express-validator';
 
@@ -65,6 +66,24 @@ class UserController {
             res.status(200).json({
                 message: 'User interests retrieved successfully',
                 data: userInterests
+            });
+        } catch (error) {
+            // Pass any errors to the error handling middleware
+            res.status(401).json({ error: error.message });
+        }
+    }
+
+    async createCommunity(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const user_id = req.user.id;
+            await CommunityService.create(user_id, req.body);
+            res.status(200).json({
+                message: 'Community created successfully',
+                data: req.body
             });
         } catch (error) {
             // Pass any errors to the error handling middleware

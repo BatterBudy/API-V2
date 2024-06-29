@@ -37,13 +37,13 @@ class UserRepository {
         if (this.id) {
             // Update existing user
             await pool.query(
-                'UPDATE users SET username = ?, email = ?, password = ?, role = ? WHERE id = ?',
+                'UPDATE user SET username = ?, email = ?, password = ?, role = ? WHERE id = ?',
                 [this.username, this.email, this.password, this.role, this.id]
             );
         } else {
             // Insert new user
             const [result] = await pool.query(
-                'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+                'INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, ?)',
                 [this.username, this.email, this.password, this.role]
             );
             this.id = result.insertId;
