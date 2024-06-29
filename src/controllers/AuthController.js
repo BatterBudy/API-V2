@@ -26,22 +26,9 @@ class AuthController {
             const { email, password } = req.body;
             const token = await UserService.login(email, password);
             res.json({ token });
-        } catch (error) {
+        }
+        catch (error) {
             res.status(401).json({ error: error.message });
-        }
-    }
-
-    async validateOtp(req, res) {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        try {
-            const opt = await UserService.validateOpt(req.body);
-            res.status(202).json({ opt });
-        } catch (error) {
-            res.status(400).json({ error: error.message });
         }
     }
 }

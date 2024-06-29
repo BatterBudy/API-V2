@@ -44,7 +44,7 @@ export const validateOptValidation = [
         .withMessage('User ID cannot be empty')
         .isNumeric()
         .withMessage('Must be a valid User id'),
-    body('otp')
+    body('otp_code')
         .notEmpty()
         .withMessage('OTP is required')
         .isLength({ min: 6, max: 6 })

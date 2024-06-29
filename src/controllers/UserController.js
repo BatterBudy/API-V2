@@ -1,0 +1,35 @@
+import UserService from '../services/UserService.js';
+
+class UserController {
+    async validateOtp(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            await UserService.validateOpt(req.body);
+            res.status(202).json({ message: "Opt successfully validated" });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
+    async profile(req, res) {
+        try {
+            const user_id = req.user.id;
+            const userProfile = await UserService.getUserProfile(user_id);
+            if (!userProfile) {
+                return res.status(404).json({ message: 'User profile not found' });
+            }
+            res.status(200).json({
+                message: 'User profile retrieved successfully',
+                data: userProfile
+            });
+        } catch (error) {
+            // Pass any errors to the error handling middleware
+            res.status(401).json({ error: error.message });
+        }
+    }
+}
+
+export default new UserController();
