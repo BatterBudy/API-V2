@@ -41,6 +41,10 @@ testConnection();
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Hello, Express!');
+});
+
 app.use('/auth', authRoutes);
 app.use("/otp", otpRoutes);
 app.use('/user', authMiddleware, userRoutes);
