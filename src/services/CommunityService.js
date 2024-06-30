@@ -1,5 +1,5 @@
 import CommunityRepository from "../repositories/CommunityRepository.js";
-import UserRepository from "../repositories/UserRepository.js";
+import { validateUser } from "../helpers/userHelpers.js";
 
 class CommunityService {
     async create(user_id, community) {
@@ -7,10 +7,7 @@ class CommunityService {
 
 
         // Validate user exists
-        const user = await UserRepository.findById(user_id);
-        if (!user) {
-            throw new Error('User not found');
-        }
+        await validateUser(user_id);
         // Validate User has not created community with same name
         const existingCommunity = await CommunityRepository.findByUserIdAndName(user_id, name.toLowerCase());
         if (existingCommunity) {

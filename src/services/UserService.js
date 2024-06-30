@@ -8,7 +8,7 @@ import ms from 'ms';
 import UserInterestRepository from '../repositories/UserInterestRepository.js';
 import InterestRepository from '../repositories/InterestRepository.js';
 import InviteRepository from '../repositories/InviteRepository.js';
-import UserCommunityRepository from '../repositories/UserCommunityRepository.js';
+import CommunityInviteRepository from '../repositories/CommunityInviteRepository.js';
 
 //TODO : refresh token
 class UserService {
@@ -32,10 +32,21 @@ class UserService {
 
         const user = await UserRepository.create(userData);
         if (user) {
-            await UserCommunityRepository.create(user.id, invited_user.community_id);
 
             const inviteUpdateDetails = { id: invited_user.id, is_used: true };
             await InviteRepository.update(inviteUpdateDetails);
+
+            //Move Invitation to Community Invite
+            CommunityInviteRepository.create({ user_id: invited_user.user_id, invitee_id: user.id, community_id: invited_user.community_id });
+
+
+            //Generate OTP
+            const otpCode = generateOTP();
+            const otpDetails = { user_id: user.id, otp_code: otpCode };
+            await OptRepository.create(otpDetails);
+
+            //TODO : send otp to user.
+
         }
 
         // Destructure user and omit the password field
@@ -94,6 +105,12 @@ class UserService {
             throw new Error('OTP has expired');
         }
 
+        // Get user details
+        const user = await UserRepository.findById(user_id);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
         // Update OTP as used
         await OptRepository.update({ id: opt.id, is_used: true });
 
@@ -136,6 +153,7 @@ class UserService {
         const userInterests = await UserInterestRepository.findAllByUserId(user_id);
         return userInterests;
     }
+
     generateAccessToken(user) {
         return jwt.sign(
             { userId: user.id, email: user.email },
@@ -163,6 +181,8 @@ class UserService {
             { expiresIn: '1h' }
         );
     }
+
+
 }
 
 export default new UserService();

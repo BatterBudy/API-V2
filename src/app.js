@@ -7,6 +7,8 @@ import userRoutes from './routes/userRoutes.js';
 import adminInterestRoutes from './routes/admin/interestRoutes.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import listingRoutes from './routes/listingRoutes.js';
+import communityRoute from './routes/communityRoutes.js';
+import errorMiddleware from './middleware/errorMiddleware.js';
 
 const app = express();
 
@@ -43,10 +45,12 @@ app.use('/auth', authRoutes);
 app.use("/otp", otpRoutes);
 app.use('/user', authMiddleware, userRoutes);
 app.use('/listing', authMiddleware, listingRoutes);
+app.use('/community', authMiddleware, communityRoute);
 
 //Admin routes
 app.use('/admin/interest', authMiddleware, adminInterestRoutes);
 
+app.use(errorMiddleware);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
