@@ -35,7 +35,7 @@ async function testConnection() {
     }
 }
 
-testConnection();
+//testConnection();
 
 // Middleware
 app.use(express.json());
