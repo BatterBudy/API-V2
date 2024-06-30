@@ -3,15 +3,13 @@ import UserRepository from '../repositories/UserRepository.js';
 import InterestRepository from '../repositories/InterestRepository.js';
 import UserInterestRepository from '../repositories/UserInterestRepository.js';
 import UserCommunityRepository from '../repositories/UserCommunityRepository.js';
+import { validateUser } from '../helpers/userHelpers.js';
 class ListingService {
 
     async create(user_id, listing) {
         // Validate user exists
         const { interest_id, community_id } = listing;
-        const user = await UserRepository.findById(user_id);
-        if (!user) {
-            throw new Error('User not found');
-        }
+        validateUser(user_id);
 
         // Validate interest exists
         const interest = await InterestRepository.findById(interest_id);

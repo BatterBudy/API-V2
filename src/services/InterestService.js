@@ -2,7 +2,6 @@ import InterestRepository from '../repositories/InterestRepository.js';
 
 class InterestService {
 
-
     async create(interest) {
         //check if interest already existed
         var { name } = interest;
