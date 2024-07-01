@@ -9,10 +9,25 @@ import UserInterestRepository from '../repositories/UserInterestRepository.js';
 import InterestRepository from '../repositories/InterestRepository.js';
 import InviteRepository from '../repositories/InviteRepository.js';
 import CommunityInviteRepository from '../repositories/CommunityInviteRepository.js';
+import { cleanUserData } from '../helpers/userHelpers.js';
 
-//TODO : refresh token
+
 class UserService {
     async register(userData) {
+        await this.checkUserExistence(userData);
+        const invitedUser = await this.verifyInvitation(userData);
+
+        const user = await UserRepository.create(userData);
+        if (user) {
+            await this.updateInvite(invitedUser);
+            await this.moveInvitationToCommunityInvite(invitedUser, user.id);
+            await this.generateAndSendOTP(user.id);
+        }
+
+        return this.cleanUserData(user);
+    }
+
+    async checkUserExistence(userData) {
         const existingUser = await UserRepository.findByEmailOrPhoneNumber(userData.email, userData.phone_number);
         if (existingUser?.email === userData.email) {
             throw new Error('Email already in use');
@@ -21,44 +36,45 @@ class UserService {
         if (existingUser?.phone_number === userData.phone_number) {
             throw new Error('Phone Number already in use');
         }
+    }
 
-        //check if user was invited
-        const inviteDetails = { email: userData.email, phone_number: userData.phone_number, join_code: userData.join_code }
-        const invited_user = await InviteRepository.findByUserDetails(inviteDetails);
-
-        if (!invited_user) {
+    async verifyInvitation(userData) {
+        const inviteDetails = {
+            email: userData.email,
+            phone_number: userData.phone_number,
+            join_code: userData.join_code
+        };
+        const invitedUser = await InviteRepository.findByUserDetails(inviteDetails);
+        if (!invitedUser) {
             throw new Error('User was not invited');
         }
 
-        // Validate user invite code
-        if (invited_user.join_code !== userData.join_code) {
+        if (invitedUser.join_code !== userData.join_code) {
             throw new Error('Invalid invitation code');
         }
-
-        const user = await UserRepository.create(userData);
-        if (user) {
-
-            const inviteUpdateDetails = { id: invited_user.id, is_used: true };
-            await InviteRepository.update(inviteUpdateDetails);
-
-            //Move Invitation to Community Invite
-            CommunityInviteRepository.create({ user_id: invited_user.user_id, invitee_id: user.id, community_id: invited_user.community_id });
-
-
-            //Generate OTP
-            const otpCode = generateOTP();
-            const otpDetails = { user_id: user.id, otp_code: otpCode };
-            await OptRepository.create(otpDetails);
-
-            //TODO : send otp to user.
-
-        }
-
-        // Destructure user and omit the password field
-        const { password, ...userWithoutPassword } = user;
-
-        return userWithoutPassword;
+        return invitedUser;
     }
+
+    async updateInvite(invitedUser) {
+        const inviteUpdateDetails = { id: invitedUser.id, is_used: true };
+        await InviteRepository.update(inviteUpdateDetails);
+    }
+
+    async moveInvitationToCommunityInvite(invitedUser, userId) {
+        await CommunityInviteRepository.create({
+            user_id: invitedUser.user_id,
+            invitee_id: userId,
+            community_id: invitedUser.community_id
+        });
+    }
+
+    async generateAndSendOTP(userId) {
+        const otpCode = generateOTP();
+        const otpDetails = { user_id: userId, otp_code: otpCode };
+        await OptRepository.create(otpDetails);
+        // TODO: send otp to user
+    }
+
 
     async login(email, password, remember_me = false) {
         const user = await UserRepository.findByEmail(email);
@@ -81,13 +97,14 @@ class UserService {
         const accessTokenExpiration = new Date(Date.now() + ms(expiresIn));
         const refreshTokenExpiration = new Date(Date.now() + ms('30d'));
 
+        const cleanUser = cleanUserData(user);
+
         return {
             accessToken,
             refreshToken,
             accessTokenExpiration,
             refreshTokenExpiration,
-            userId: user.id,
-            email: user.email
+            user: cleanUser,
         };
     }
 
