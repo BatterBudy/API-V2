@@ -9,7 +9,7 @@ import UserInterestRepository from '../repositories/UserInterestRepository.js';
 import InterestRepository from '../repositories/InterestRepository.js';
 import InviteRepository from '../repositories/InviteRepository.js';
 import CommunityInviteRepository from '../repositories/CommunityInviteRepository.js';
-import { cleanUserData } from '../helpers/userHelpers.js';
+import { cleanUserData, validateUser } from '../helpers/userHelpers.js';
 
 
 class UserService {
@@ -139,10 +139,11 @@ class UserService {
         return true;
     }
 
-    async getUserProfile(userId) {
-        const user = await UserRepository.findById(userId);
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+    async getUserProfile(user_id) {
+        const user = validateUser(user_id);
+        console.log(user);
+
+        return cleanUserData(user);
     }
 
     async addUserInterest({ user_id, interest_id }) {
