@@ -30,6 +30,11 @@ class UserService {
             throw new Error('User was not invited');
         }
 
+        // Validate user invite code
+        if (invited_user.join_code !== userData.join_code) {
+            throw new Error('Invalid invitation code');
+        }
+
         const user = await UserRepository.create(userData);
         if (user) {
 

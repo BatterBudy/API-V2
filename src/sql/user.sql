@@ -12,3 +12,6 @@ CREATE TABLE IF NOT EXISTS user (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
+
+INSERT INTO user (first_name, last_name, email, phone_number, password, role) VALUES
+('Admin', 'Admin', 'n7C4L@example.com', '1234567890', 'admin', 'admin');

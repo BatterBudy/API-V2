@@ -12,16 +12,23 @@ import errorMiddleware from './middleware/errorMiddleware.js';
 
 const app = express();
 
-// Create MySQL connection pool
-// const pool = mysql.createPool({
-//     host: process.env.DB_HOST,
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASSWORD,
-//     database: process.env.DB_NAME,
-//     waitForConnections: true,
-//     connectionLimit: 10,
-//     queueLimit: 0
-// });
+
+
+//Create MySQL connection pool
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    // ssl: {
+    //     ca: process.env.DB_SSL_CA
+    // }
+});
+
 
 // Test the database connection
 async function testConnection() {
@@ -35,7 +42,7 @@ async function testConnection() {
     }
 }
 
-//testConnection();
+testConnection();
 
 // Middleware
 app.use(express.json());
@@ -63,6 +70,6 @@ app.listen(PORT, () => {
 });
 
 // Make the pool available globally
-// app.locals.db = pool;
+app.locals.db = pool;
 
 export default app;

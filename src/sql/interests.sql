@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS interest (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name TEXT UNIQUE NOT NULL,
-    description TEXT,
+    name varchar(150) UNIQUE NOT NULL,
+    description TEXT(1000),
     is_deleted BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

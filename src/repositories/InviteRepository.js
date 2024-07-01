@@ -21,7 +21,7 @@ class InviteRepository {
         const { email, phone_number, join_code } = inviteDetails;
 
         const [rows] = await pool.query(
-            "SELECT * FROM invite WHERE email = ? OR phone_number = ? AND join_code = ?", [email, phone_number, join_code]
+            "SELECT * FROM invite WHERE email = ? OR phone_number = ? AND join_code = ? AND is_used = false", [email, phone_number, join_code]
         );
 
         return rows[0];

@@ -12,3 +12,5 @@ CREATE TABLE IF NOT EXISTS invite (
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (community_id) REFERENCES community(id)
 )
+
+INSERT INTO invite (user_id, community_id, join_code, email) VALUES (1, 1, '12345',  'ola@example.com');
