@@ -24,7 +24,7 @@ class UserService {
             await this.generateAndSendOTP(user.id);
         }
 
-        return this.cleanUserData(user);
+        return cleanUserData(user);
     }
 
     async checkUserExistence(userData) {
