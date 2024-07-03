@@ -10,6 +10,8 @@ import InterestRepository from '../repositories/InterestRepository.js';
 import InviteRepository from '../repositories/InviteRepository.js';
 import CommunityInviteRepository from '../repositories/CommunityInviteRepository.js';
 import { cleanUserData, validateUser } from '../helpers/userHelpers.js';
+import ListingRepository from '../repositories/ListingRepository.js';
+import { uploadFile } from '../utils/FileUploadService.js';
 
 
 class UserService {
@@ -24,7 +26,7 @@ class UserService {
             await this.generateAndSendOTP(user.id);
         }
 
-        return cleanUserData(user);
+        return await cleanUserData(user);
     }
 
     async checkUserExistence(userData) {
@@ -97,7 +99,7 @@ class UserService {
         const accessTokenExpiration = new Date(Date.now() + ms(expiresIn));
         const refreshTokenExpiration = new Date(Date.now() + ms('30d'));
 
-        const cleanUser = cleanUserData(user);
+        const cleanUser = await cleanUserData(user);
         const auth = { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration };
 
         return {
@@ -138,12 +140,49 @@ class UserService {
     }
 
     async getUserProfile(user_id) {
-        const user = validateUser(user_id);
+
+        const user = await validateUser(user_id);
         console.log(user);
 
-        return cleanUserData(user);
+        // Get user details
+        //get user listing
+        const listing_count = 0;
+        const batter_count = { total: 0, successful: 0, failed: 0 };
+        const interest_count = 0;
+        const recent_listings = {};
+        const communities = {};
+
+        const result = {
+            listing_count,
+            batter_count,
+            interest_count,
+            recent_listings,
+            communities,
+            user
+        };
+
+        return result;
     }
 
+
+    async uploadProfilePicture(user_id, file) {
+        var user = await validateUser(user_id);
+        const profile_picture = await uploadFile('images', file);
+        console.log(profile_picture);
+        if (!profile_picture) {
+            throw new Error('Profile picture upload failed');
+        }
+
+        //Add image to user object
+        user.image = profile_picture;
+
+        console.log(user);
+
+        const updated_user = await UserRepository.update(user.id, user);
+        console.log(updated_user);
+
+        return await cleanUserData(updated_user);
+    }
     async addUserInterest({ user_id, interest_id }) {
         const user = await UserRepository.findById(user_id);
         if (!user) {

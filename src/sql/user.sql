@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS user (
   last_name VARCHAR(255)   NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   phone_number VARCHAR(255) UNIQUE NOT NULL,
+  image VARCHAR(255),
   password VARCHAR(255) NOT NULL,
   role ENUM('user', 'community_leader', 'community_moderator','admin') DEFAULT 'user',
   is_active BOOLEAN DEFAULT true,

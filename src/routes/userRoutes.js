@@ -11,6 +11,6 @@ router.post('/interest', validateUserInterests, authMiddleware, UserController.a
 router.get('/interest', authMiddleware, UserController.getUserInterests.bind(UserController));
 
 router.post('/community', validateAddCommunity, authMiddleware, UserController.createCommunity.bind(UserController));
-
+router.post('/profile/picture', authMiddleware, UserController.uploadProfilePicture.bind(UserController));
 
 export default router;

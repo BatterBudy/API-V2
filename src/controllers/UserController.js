@@ -34,6 +34,26 @@ class UserController {
         }
     }
 
+    async uploadProfilePicture(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const user_id = req.user.id;
+            console.log(req.body.file);
+
+            const profilePicture = await UserService.uploadProfilePicture(user_id, req.body.file);
+        
+            res.status(200).json({
+                message: 'Profile picture uploaded successfully',
+                data: profilePicture
+            });
+        } catch (error) {
+            // Pass any errors to the error handling middleware
+            res.status(400).json({ error: error.message });
+        }
+    }
     async addUserInterest(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

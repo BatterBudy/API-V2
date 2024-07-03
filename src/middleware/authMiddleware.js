@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import UserRepository from '../repositories/UserRepository.js';
+import { cleanUserData } from '../helpers/userHelpers.js';
 
 const authMiddleware = async (req, res, next) => {
     try {
@@ -12,7 +13,7 @@ const authMiddleware = async (req, res, next) => {
             throw new Error();
         }
 
-        req.user = user;
+        req.user = cleanUserData(user);
         req.token = token;
         next();
     } catch (error) {

@@ -33,6 +33,16 @@ class UserRepository {
         return rows[0];
     }
 
+    async update(id, userDetails) {
+        const { first_name, last_name, email, phone_number, image, role = 'user' } = userDetails;
+
+        const [result] = await pool.query(
+            'UPDATE user SET first_name = ?, last_name = ?, email = ?, phone_number = ?, image = ?, role = ? WHERE id = ?',
+            [first_name, last_name, email, phone_number, image, role, id]
+        );
+
+        return this.findById(id);
+    }
     async save() {
         if (this.id) {
             // Update existing user

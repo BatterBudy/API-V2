@@ -10,7 +10,10 @@ class AuthController {
 
         try {
             const user = await UserService.register(req.body);
-            res.status(201).json({ user });
+            res.status(201).json({
+                message: 'User created successfully',
+                user
+            });
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
@@ -25,7 +28,10 @@ class AuthController {
         try {
             const { email, password } = req.body;
             const data = await UserService.login(email, password);
-            res.json({ data });
+            res.json({
+                message: 'User logged in successfully',
+                data
+            });
         }
         catch (error) {
             res.status(401).json({ error: error.message });
