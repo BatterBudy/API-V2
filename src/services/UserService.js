@@ -98,12 +98,10 @@ class UserService {
         const refreshTokenExpiration = new Date(Date.now() + ms('30d'));
 
         const cleanUser = cleanUserData(user);
+        const auth = { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration };
 
         return {
-            accessToken,
-            refreshToken,
-            accessTokenExpiration,
-            refreshTokenExpiration,
+            auth: auth,
             user: cleanUser,
         };
     }

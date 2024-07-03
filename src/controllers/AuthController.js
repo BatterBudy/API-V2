@@ -24,8 +24,8 @@ class AuthController {
 
         try {
             const { email, password } = req.body;
-            const token = await UserService.login(email, password);
-            res.json({ token });
+            const user = await UserService.login(email, password);
+            res.json({ user });
         }
         catch (error) {
             res.status(401).json({ error: error.message });
