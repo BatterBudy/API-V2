@@ -66,7 +66,7 @@ describe('AuthController', () => {
     });
 
     describe('login', () => {
-        it('should login a user and return a token', async () => {
+        it('should login a user and return a user', async () => {
             req.body = { email: 'test@example.com', password: 'password123' };
             validationResult.mockReturnValue({ isEmpty: () => true });
             UserService.login.mockResolvedValue('mocked_token');
@@ -74,7 +74,7 @@ describe('AuthController', () => {
             await AuthController.login(req, res);
 
             expect(UserService.login).toHaveBeenCalledWith(req.body.email, req.body.password);
-            expect(res.json).toHaveBeenCalledWith({ token: 'mocked_token' });
+            expect(res.json).toHaveBeenCalledWith({ user: 'mocked_token' });
         });
 
         it('should return validation errors if present', async () => {
@@ -99,5 +99,5 @@ describe('AuthController', () => {
         });
     });
 
-    
+
 });

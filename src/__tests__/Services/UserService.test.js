@@ -106,12 +106,14 @@ describe('UserService', () => {
             cleanUserData.mockReturnValue({ id: 1, email: 'test@example.com' });
 
             const result = await UserService.login('test@example.com', 'password');
-
-            expect(result).toEqual({
+            const auth = {
                 accessToken: 'token',
                 refreshToken: 'token',
                 accessTokenExpiration: expect.any(Date),
                 refreshTokenExpiration: expect.any(Date),
+            }
+            expect(result).toEqual({
+                auth: auth,
                 user: { id: 1, email: 'test@example.com' },
             });
             expect(UserRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
@@ -204,5 +206,5 @@ describe('UserService', () => {
         });
     });
 
-  
+
 });
