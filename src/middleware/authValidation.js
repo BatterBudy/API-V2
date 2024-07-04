@@ -38,3 +38,11 @@ export const loginValidation = [
         .withMessage('Password is required')
 ];
 
+export const refreshTokenValidation = [
+    body('refresh_token')
+        .notEmpty()
+        .withMessage('Refresh token is required')
+
+];
+
+

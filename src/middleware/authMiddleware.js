@@ -6,14 +6,14 @@ const authMiddleware = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '').split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        var user_id = decoded.userId;
+        var user_id = decoded.user_id;
         const user = await UserRepository.findById(user_id);
 
         if (!user) {
             throw new Error();
         }
 
-        req.user = cleanUserData(user);
+        req.user = await cleanUserData(user);
         req.token = token;
         next();
     } catch (error) {

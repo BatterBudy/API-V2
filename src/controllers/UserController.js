@@ -19,6 +19,7 @@ class UserController {
 
     async profile(req, res) {
         try {
+            console.log(req.user);
             const user_id = req.user.id;
             const userProfile = await UserService.getUserProfile(user_id);
             if (!userProfile) {
@@ -44,7 +45,7 @@ class UserController {
             console.log(req.body.file);
 
             const profilePicture = await UserService.uploadProfilePicture(user_id, req.body.file);
-        
+
             res.status(200).json({
                 message: 'Profile picture uploaded successfully',
                 data: profilePicture

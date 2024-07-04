@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import UserRepository from '../repositories/UserRepository.js';
 import OptRepository from '../repositories/OtpRepository.js'
 import { generateOTP } from '../utils/otpHelper.js'
@@ -12,7 +11,7 @@ import CommunityInviteRepository from '../repositories/CommunityInviteRepository
 import { cleanUserData, validateUser } from '../helpers/userHelpers.js';
 import ListingRepository from '../repositories/ListingRepository.js';
 import { uploadFile } from '../utils/fileUploadService.js';
-
+import jwt from 'jsonwebtoken';
 
 class UserService {
     async register(userData) {
@@ -29,6 +28,68 @@ class UserService {
         return await cleanUserData(user);
     }
 
+    async login(email, password, remember_me = false) {
+        const user = await UserRepository.findByEmail(email);
+        if (!user) {
+            throw new Error('Invalid credentials');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new Error('Invalid credentials');
+        }
+
+        //TODO: Add check if user is verified
+        return await this.generateUserTokens(user, remember_me);
+    }
+
+    async refreshToken(refreshToken) {
+        const user = await this.verifyRefreshToken(refreshToken);
+
+        return await this.generateUserTokens(user);
+    }
+
+    async verifyRefreshToken(token) {
+        console.log(token);
+
+        try {
+            const { user_id } = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+            const user = await validateUser(user_id);
+
+            console.log(user);
+
+            return user;
+        } catch (error) {
+            console.log(error);
+            throw new Error('Invalid refresh token');
+        }
+    }
+
+    async generateUserTokens(user, remember_me = false) {
+        try {
+
+            const accessToken = this.generateAccessToken(user);
+            const refreshToken = this.generateRefreshToken(user);
+
+            // Save refresh token in the database
+            await this.saveRefreshToken(user.id, refreshToken);
+
+            const expiresIn = remember_me ? '30d' : '1h';
+            const accessTokenExpiration = new Date(Date.now() + ms(expiresIn));
+            const refreshTokenExpiration = new Date(Date.now() + ms('30d'));
+
+            const cleanUser = await cleanUserData(user);
+            const auth = { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration };
+
+            return {
+                auth: auth,
+                user: cleanUser,
+            };
+
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
     async checkUserExistence(userData) {
         const existingUser = await UserRepository.findByEmailOrPhoneNumber(userData.email, userData.phone_number);
         if (existingUser?.email === userData.email) {
@@ -62,51 +123,23 @@ class UserService {
         await InviteRepository.update(inviteUpdateDetails);
     }
 
-    async moveInvitationToCommunityInvite(invitedUser, userId) {
+    async moveInvitationToCommunityInvite(invitedUser, user_id) {
         await CommunityInviteRepository.create({
             user_id: invitedUser.user_id,
-            invitee_id: userId,
+            invitee_id: user_id,
             community_id: invitedUser.community_id
         });
     }
 
-    async generateAndSendOTP(userId) {
+    async generateAndSendOTP(user_id) {
         const otpCode = generateOTP();
-        const otpDetails = { user_id: userId, otp_code: otpCode };
+        const otpDetails = { user_id: user_id, otp_code: otpCode };
         await OptRepository.create(otpDetails);
         // TODO: send otp to user
     }
 
 
-    async login(email, password, remember_me = false) {
-        const user = await UserRepository.findByEmail(email);
-        if (!user) {
-            throw new Error('Invalid credentials');
-        }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            throw new Error('Invalid credentials');
-        }
-
-        const accessToken = this.generateAccessToken(user);
-        const refreshToken = this.generateRefreshToken(user);
-
-        // Save refresh token in the database
-        await this.saveRefreshToken(user.id, refreshToken);
-
-        const expiresIn = remember_me ? '30d' : '1h';
-        const accessTokenExpiration = new Date(Date.now() + ms(expiresIn));
-        const refreshTokenExpiration = new Date(Date.now() + ms('30d'));
-
-        const cleanUser = await cleanUserData(user);
-        const auth = { accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration };
-
-        return {
-            auth: auth,
-            user: cleanUser,
-        };
-    }
 
     async validateOpt(otpDetails) {
         const { user_id, otp_code } = otpDetails;
@@ -141,7 +174,10 @@ class UserService {
 
     async getUserProfile(user_id) {
 
+        console.log("UserService.getUserProfile", user_id);
+
         const user = await validateUser(user_id);
+
         console.log(user);
 
         // Get user details
@@ -152,13 +188,15 @@ class UserService {
         const recent_listings = {};
         const communities = {};
 
+        const cleanUser = await cleanUserData(user);
+
         const result = {
             listing_count,
             batter_count,
             interest_count,
             recent_listings,
             communities,
-            user
+            user: cleanUser
         };
 
         return result;
@@ -216,7 +254,7 @@ class UserService {
 
     generateAccessToken(user) {
         return jwt.sign(
-            { userId: user.id, email: user.email },
+            { user_id: user.id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -224,14 +262,14 @@ class UserService {
 
     generateRefreshToken(user) {
         return jwt.sign(
-            { userId: user.id },
+            { user_id: user.id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '30d' }
         );
     }
 
-    async saveRefreshToken(userId, refreshToken) {
-        await RefreshTokenRepository.create({ user_id: userId, token: refreshToken });
+    async saveRefreshToken(user_id, refreshToken) {
+        await RefreshTokenRepository.create({ user_id: user_id, token: refreshToken });
     }
 
     generateToken(user) {

@@ -37,6 +37,26 @@ class AuthController {
             res.status(401).json({ error: error.message });
         }
     }
+
+
+    async refreshToken(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            const { refresh_token } = req.body;
+            const data = await UserService.refreshToken(refresh_token);
+            res.json({
+                message: 'Token refreshed successfully',
+                data
+            });
+        }
+        catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 export default new AuthController();
