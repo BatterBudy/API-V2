@@ -1,6 +1,6 @@
 
 import UserRepository from '../repositories/UserRepository.js';
-import { generateBlobSasUrl } from '../utils/FileUploadService.js';
+import { generateBlobSasUrl } from '../utils/fileUploadService.js';
 
 export const validateUser = async (user_id) => {
     const user = await UserRepository.findById(user_id);
@@ -22,7 +22,7 @@ export const cleanUserData = async (user) => {
 
 export const generateProfileImageUrl = async (user) => {
     console.log("Getting the profile image url");
-    
+
     try {
         const url = await generateBlobSasUrl('images', user.image); // Await the promise
         if (url !== null) {

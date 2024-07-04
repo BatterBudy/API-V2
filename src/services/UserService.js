@@ -11,7 +11,7 @@ import InviteRepository from '../repositories/InviteRepository.js';
 import CommunityInviteRepository from '../repositories/CommunityInviteRepository.js';
 import { cleanUserData, validateUser } from '../helpers/userHelpers.js';
 import ListingRepository from '../repositories/ListingRepository.js';
-import { uploadFile } from '../utils/FileUploadService.js';
+import { uploadFile } from '../utils/fileUploadService.js';
 
 
 class UserService {
