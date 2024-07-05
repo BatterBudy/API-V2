@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import mysql from 'mysql2/promise';
 import authRoutes from './routes/authRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -9,32 +8,18 @@ import { authMiddleware } from './middleware/authMiddleware.js';
 import listingRoutes from './routes/listingRoutes.js';
 import communityRoute from './routes/communityRoutes.js';
 import errorMiddleware from './middleware/errorMiddleware.js';
+import pool from './database.js';
+import app_insight_client from './appInsight.js';
+
 
 const app = express();
-
-
-
-//Create MySQL connection pool
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    // ssl: {
-    //     ca: process.env.DB_SSL_CA
-    // }
-});
-
 
 // Test the database connection
 async function testConnection() {
     try {
         const connection = await pool.getConnection();
         console.log('Connected to MySQL database');
+
         connection.release();
     } catch (error) {
         console.error('Error connecting to the database:', error);
@@ -46,6 +31,7 @@ testConnection();
 
 // Middleware
 app.use(express.json());
+
 
 // Routes
 app.get('/', (req, res) => {

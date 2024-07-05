@@ -11,10 +11,10 @@ export const validateUser = async (user_id) => {
 }
 
 export const cleanUserData = async (user) => {
-    var { password, ...cleanUser } = user;
+    const { password, ...cleanUser } = user;
 
     if (cleanUser.image) {
-        cleanUser = await generateProfileImageUrl(cleanUser); // Await the promise
+        return await generateProfileImageUrl(cleanUser); // Await the promise
     }
 
     return cleanUser;
@@ -28,6 +28,7 @@ export const generateProfileImageUrl = async (user) => {
         if (url !== null) {
             user.image = url;
         }
+        
         return user;
     } catch (error) {
         console.log(error);
