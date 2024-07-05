@@ -12,9 +12,11 @@ import { cleanUserData, validateUser } from '../helpers/userHelpers.js';
 import ListingRepository from '../repositories/ListingRepository.js';
 import { uploadFile } from '../utils/fileUploadService.js';
 import jwt from 'jsonwebtoken';
+import logger from '../utils/logger.js';
 
 class UserService {
     async register(userData) {
+
         await this.checkUserExistence(userData);
         const invitedUser = await this.verifyInvitation(userData);
 
@@ -91,7 +93,10 @@ class UserService {
         }
     }
     async checkUserExistence(userData) {
+
+
         const existingUser = await UserRepository.findByEmailOrPhoneNumber(userData.email, userData.phone_number);
+
         if (existingUser?.email === userData.email) {
             throw new Error('Email already in use');
         }

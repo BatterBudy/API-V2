@@ -1,8 +1,11 @@
 import { validationResult } from 'express-validator';
 import UserService from '../services/UserService.js';
+import logger from '../utils/logger.js';
 
 class AuthController {
     async register(req, res) {
+        logger.info(`Registering user: ${JSON.stringify(req.body.email)}`);
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
