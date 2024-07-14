@@ -4,9 +4,15 @@ import { cleanUserData } from '../helpers/userHelpers.js';
 
 const authMiddleware = async (req, res, next) => {
     try {
-        console.log(req.header('Authorization'));
+        console.log("Logging the entire header", req.header());
+        console.log("Logging the Authorization header", req.header('Authorization'));
 
         const token = req.header('Authorization').replace('Bearer ', '').split(' ')[1];
+
+        console.log("Collecting token", token);
+        if (!token) {
+            throw new Error('Please authenticate. No token provided');
+        }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user_id = decoded.user_id;
         const user = await UserRepository.findById(user_id);
