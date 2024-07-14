@@ -7,9 +7,10 @@ const authMiddleware = async (req, res, next) => {
         // console.log("Logging the entire header", req.header());
         console.log("Logging the Authorization header", req.header('Authorization'));
 
-        const token = req.header('Authorization').replace('Bearer ', '').split(' ')[1];
+        const token = req.header('Authorization').split(' ')[1];
 
         console.log("Collecting token", token);
+        
         if (!token) {
             throw new Error('Please authenticate. No token provided');
         }
