@@ -4,13 +4,15 @@ import { cleanUserData } from '../helpers/userHelpers.js';
 
 const authMiddleware = async (req, res, next) => {
     try {
+        console.log(req.header('Authorization'));
+
         const token = req.header('Authorization').replace('Bearer ', '').split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        var user_id = decoded.user_id;
+        const user_id = decoded.user_id;
         const user = await UserRepository.findById(user_id);
 
         if (!user) {
-            throw new Error();
+            throw new Error("User not found");
         }
 
         req.user = await cleanUserData(user);

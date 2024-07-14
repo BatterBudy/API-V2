@@ -94,7 +94,6 @@ class UserService {
     }
     async checkUserExistence(userData) {
 
-
         const existingUser = await UserRepository.findByEmailOrPhoneNumber(userData.email, userData.phone_number);
 
         if (existingUser?.email === userData.email) {
