@@ -111,6 +111,23 @@ class UserController {
             res.status(401).json({ error: error.message });
         }
     }
+
+    async getCommunities(req, res) {
+        try {
+            const user_id = req.user.id;
+            const communities = await CommunityService.getCommunities(user_id);
+            if (!communities) {
+                return res.status(404).json({ message: 'Communities not found' });
+            }
+            res.status(200).json({
+                message: 'Communities retrieved successfully',
+                data: communities
+            });
+        } catch (error) {
+            // Pass any errors to the error handling middleware
+            res.status(401).json({ error: error.message });
+        }
+    }
 }
 
 export default new UserController();

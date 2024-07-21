@@ -1,5 +1,6 @@
 import CommunityRepository from "../repositories/CommunityRepository.js";
 import { validateUser } from "../helpers/userHelpers.js";
+import UserCommunityRepository from "../repositories/UserCommunityRepository.js";
 
 class CommunityService {
     async create(user_id, community) {
@@ -9,6 +10,12 @@ class CommunityService {
         this.validateCommunityCreated(user_id, name);
 
         return await CommunityRepository.create({ user_id, name, description });
+    }
+
+    async getCommunities(user_id) {
+        await validateUser(user_id);
+
+        return await UserCommunityRepository.findByUserId(user_id);
     }
 
     async validateCommunityCreated(user_id, community_name) {
