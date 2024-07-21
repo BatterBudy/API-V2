@@ -21,7 +21,6 @@ class UserCommunityRepository {
         const [rows] = await pool.query(`SELECT uc.*, c.* FROM user_community uc
         JOIN community c ON uc.community_id = c.id
         WHERE uc.user_id = ?`, [user_id]);
-
         return rows;
     }
 }
