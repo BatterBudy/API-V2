@@ -20,6 +20,11 @@ class ListingRepository {
         return rows;
     }
 
+    async addListingImages(listing_id, images) {
+        const [rows] = await pool.query('INSERT INTO listing_images (listing_id, listing_image) VALUES ?', [images.map(image => [listing_id, image])]);
+        return rows;
+    }
+
     async getRecommendations(user_id, interest_ids, limit, offset) {
         // Get listing where user_id != user_id and interest_id in interest_ids and join with interests
         const [rows] = await pool.query(`

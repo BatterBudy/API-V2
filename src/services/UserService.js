@@ -225,6 +225,7 @@ class UserService {
 
         return await cleanUserData(updated_user);
     }
+    
     async addUserInterest({ user_id, interest_id }) {
         const user = await UserRepository.findById(user_id);
         if (!user) {

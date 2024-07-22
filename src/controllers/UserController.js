@@ -42,8 +42,6 @@ class UserController {
         }
         try {
             const user_id = req.user.id;
-            console.log(req.body.file);
-
             const profilePicture = await UserService.uploadProfilePicture(user_id, req.body.file);
 
             res.status(200).json({

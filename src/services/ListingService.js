@@ -4,11 +4,13 @@ import InterestRepository from '../repositories/InterestRepository.js';
 import UserInterestRepository from '../repositories/UserInterestRepository.js';
 import UserCommunityRepository from '../repositories/UserCommunityRepository.js';
 import { validateUser } from '../helpers/userHelpers.js';
+import { uploadFile } from '../utils/fileUploadService.js';
+
 class ListingService {
 
     async create(user_id, listing) {
         // Validate user exists
-        const { interest_id, community_id } = listing;
+        const { interest_id, community_id, files } = listing;
         validateUser(user_id);
 
         // Validate interest exists
@@ -25,7 +27,32 @@ class ListingService {
 
         listing.user_id = user_id;
 
-        return await ListingRepository.create(listing);
+        const result = await ListingRepository.create(listing);
+
+        //Upload pictures
+
+        if (files) {
+            const images = await this.uploadListingPictures(result.id, files);
+            return { ...result, images };
+        }
+        return result;
+    }
+
+    async uploadListingPictures(listing_id, files) {
+
+        //Upload images in parallel
+        const uploadPromises = files.map(file => uploadFile('listings', file));
+
+        const images = await Promise.all(uploadPromises);
+
+        if (!images) {
+            throw new Error('Profile picture upload failed');
+        }
+
+        const result = await ListingRepository.addListingImages(listing_id, images);
+        //store each image name in the listing table
+
+        return result;
     }
 
     async findByUserId(user_id, limit, offset) {
