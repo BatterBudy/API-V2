@@ -19,6 +19,7 @@
     "@opentelemetry/instrumentation-winston": "^0.39.0",
     "@opentelemetry/sdk-node": "^0.52.1",
     "applicationinsights": "^3.2.0",
+    "batterbuddy.api": "file:",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
